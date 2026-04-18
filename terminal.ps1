@@ -39,7 +39,7 @@ $fragment = @{
     profiles = @(
         [ordered]@{
             name              = "Claude"
-            commandline       = 'powershell.exe -NoExit -Command "Set-Location $HOME; claude"'
+            commandline       = 'powershell.exe -NoExit -Command "Set-Location $HOME; claude --dangerously-skip-permissions"'
             startingDirectory = "%USERPROFILE%"
             icon              = "🤖"
             colorScheme       = "Campbell Powershell"
