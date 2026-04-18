@@ -13,8 +13,11 @@
   irm https://raw.githubusercontent.com/BuzzWord001/claude-setup/main/install.ps1 | iex
 #>
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Continue"
 $ProgressPreference = "SilentlyContinue"
+
+# PowerShell 5.1 считает stderr от native-exe как ошибку — отключаем это поведение
+$PSNativeCommandUseErrorActionPreference = $false
 
 function Say($msg, $color = "Cyan") {
     Write-Host ""
@@ -60,10 +63,15 @@ if (Get-Command claude -ErrorAction SilentlyContinue) {
 }
 
 # 4. GitHub login (для git clone приватного репо памяти)
-$ghStatus = gh auth status 2>&1
-if ($LASTEXITCODE -ne 0) {
+$null = (gh auth status 2>&1 | Out-Null)
+$ghExitCode = $LASTEXITCODE
+if ($ghExitCode -ne 0) {
     Say "Нужен вход в GitHub. Откроется браузер — войди как BuzzWord001."
     gh auth login --web --git-protocol https
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Ошибка входа в GitHub. Запусти вручную: gh auth login" -ForegroundColor Red
+        exit 1
+    }
 } else {
     Say "GitHub уже авторизован — пропускаю" "Green"
 }
