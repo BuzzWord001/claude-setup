@@ -47,12 +47,16 @@ Ensure-Command "node" "OpenJS.NodeJS.LTS"
 Ensure-Command "git"  "Git.Git"
 Ensure-Command "gh"   "GitHub.cli"
 
+# Перезагружаем PATH после установок — node/npm/git/gh могли добавиться
+$env:Path = [Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [Environment]::GetEnvironmentVariable("Path", "User")
+
 # 3. Claude Code
 if (Get-Command claude -ErrorAction SilentlyContinue) {
     Say "Claude Code уже установлен — пропускаю" "Green"
 } else {
     Say "Устанавливаю Claude Code (npm install -g)..."
-    npm install -g "@anthropic-ai/claude-code"
+    # Используем cmd /c для обхода PowerShell Execution Policy (npm.ps1 может быть заблокирован)
+    cmd /c "npm install -g @anthropic-ai/claude-code"
 }
 
 # 4. GitHub login (для git clone приватного репо памяти)
